@@ -218,7 +218,7 @@ export const academicoLinks = [
   },
   {
     label: "Formatos Docentes",
-    href: "https://drive.google.com/drive/folders/1qSJoZFQw3UEOUaOiZ5o06hZmsvG6a3Al",
+    href: "https://drive.google.com/drive/folders/1OwKpneX40CnR3Pv4bmhUakzqeCu1l2zS",
   },
 ];
 
