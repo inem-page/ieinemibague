@@ -207,12 +207,28 @@ export function getModalidad(slug) {
   return modalidades.find((m) => m.slug === slug);
 }
 
+export const academicoLinks = [
+  {
+    label: "Matrículas",
+    href: "https://colegiosonline.com/secure/matricula/?ie=inem",
+  },
+  {
+    label: "Plataforma",
+    href: "https://inem.colegiosonline.com/",
+  },
+  {
+    label: "Formatos Docentes",
+    href: "https://drive.google.com/drive/folders/1qSJoZFQw3UEOUaOiZ5o06hZmsvG6a3Al",
+  },
+];
+
 export const navLinks = {
   institucion: [
     { href: "/historia", label: "Nuestra Historia" },
     { href: "/mision-vision", label: "Misión y Visión" },
     { href: "/sedes", label: "Sedes" },
     { href: "/equipo", label: "Nuestro Equipo" },
+    { label: "Académico", submenu: academicoLinks },
   ],
   modalidades: modalidades.map((m) => ({
     href: `/modalidades/${m.slug}`,

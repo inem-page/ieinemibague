@@ -5,8 +5,63 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, ChevronDown } from "lucide-react";
+import { Menu, X, ChevronDown, ChevronRight, ExternalLink } from "lucide-react";
 import { navLinks } from "@/data/modalidades";
+
+function NestedSubmenu({ label, submenu }) {
+  const [open, setOpen] = useState(false);
+  const closeTimer = useRef(null);
+
+  const handleEnter = () => {
+    clearTimeout(closeTimer.current);
+    setOpen(true);
+  };
+  const handleLeave = () => {
+    closeTimer.current = setTimeout(() => setOpen(false), 150);
+  };
+
+  return (
+    <div
+      className="relative"
+      onMouseEnter={handleEnter}
+      onMouseLeave={handleLeave}
+    >
+      <button
+        className="flex w-full items-center justify-between rounded-xl px-4 py-2.5 text-left text-sm text-slate-700 transition-colors hover:bg-slate-50"
+        onClick={() => setOpen((o) => !o)}
+        aria-expanded={open}
+      >
+        {label}
+        <ChevronRight size={14} className="shrink-0 text-slate-400" />
+      </button>
+
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ opacity: 0, x: -6 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -6 }}
+            transition={{ duration: 0.18 }}
+            className="absolute left-full top-0 z-40 ml-1 w-56 overflow-hidden rounded-2xl border border-slate-100 bg-white p-2 shadow-hover"
+          >
+            {submenu.map((item) => (
+              <a
+                key={item.href}
+                href={item.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-between gap-2 rounded-xl px-4 py-2.5 text-sm text-slate-700 transition-colors hover:bg-slate-50 hover:pl-5"
+              >
+                {item.label}
+                <ExternalLink size={13} className="shrink-0 text-slate-400" />
+              </a>
+            ))}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
 
 function Dropdown({ label, items, pathname }) {
   const [open, setOpen] = useState(false);
@@ -49,20 +104,70 @@ function Dropdown({ label, items, pathname }) {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.2 }}
-            className="absolute left-0 top-full z-40 mt-1 w-60 overflow-hidden rounded-2xl border border-slate-100 bg-white p-2 shadow-hover"
+            className="absolute left-0 top-full z-40 mt-1 w-60 overflow-visible rounded-2xl border border-slate-100 bg-white p-2 shadow-hover"
           >
-            {items.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`block rounded-xl px-4 py-2.5 text-sm transition-colors hover:bg-slate-50 hover:pl-5 ${
-                  pathname === item.href
-                    ? "font-semibold text-inem-blue"
-                    : "text-slate-700"
-                }`}
+            {items.map((item) =>
+              item.submenu ? (
+                <NestedSubmenu
+                  key={item.label}
+                  label={item.label}
+                  submenu={item.submenu}
+                />
+              ) : (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`block rounded-xl px-4 py-2.5 text-sm transition-colors hover:bg-slate-50 hover:pl-5 ${
+                    pathname === item.href
+                      ? "font-semibold text-inem-blue"
+                      : "text-slate-700"
+                  }`}
+                >
+                  {item.label}
+                </Link>
+              )
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+function MobileNestedItem({ item }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div>
+      <button
+        className="flex w-full items-center justify-between rounded-xl px-4 py-2.5 text-left text-sm text-slate-600 hover:bg-slate-50"
+        onClick={() => setOpen((o) => !o)}
+        aria-expanded={open}
+      >
+        {item.label}
+        <ChevronDown
+          size={14}
+          className={`transition-transform duration-300 ${open ? "rotate-180" : ""}`}
+        />
+      </button>
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            className="overflow-hidden pl-4"
+          >
+            {item.submenu.map((sub) => (
+              <a
+                key={sub.href}
+                href={sub.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-between gap-2 rounded-xl px-4 py-2 text-sm text-slate-500 hover:bg-slate-50"
               >
-                {item.label}
-              </Link>
+                {sub.label}
+                <ExternalLink size={13} className="shrink-0 text-slate-400" />
+              </a>
             ))}
           </motion.div>
         )}
@@ -205,15 +310,19 @@ export default function Navbar() {
                         exit={{ height: 0, opacity: 0 }}
                         className="overflow-hidden pl-4"
                       >
-                        {section.items.map((item) => (
-                          <Link
-                            key={item.href}
-                            href={item.href}
-                            className="block rounded-xl px-4 py-2.5 text-sm text-slate-600 hover:bg-slate-50"
-                          >
-                            {item.label}
-                          </Link>
-                        ))}
+                        {section.items.map((item) =>
+                          item.submenu ? (
+                            <MobileNestedItem key={item.label} item={item} />
+                          ) : (
+                            <Link
+                              key={item.href}
+                              href={item.href}
+                              className="block rounded-xl px-4 py-2.5 text-sm text-slate-600 hover:bg-slate-50"
+                            >
+                              {item.label}
+                            </Link>
+                          )
+                        )}
                       </motion.div>
                     )}
                   </AnimatePresence>

@@ -85,49 +85,43 @@ export default function HistoryContent() {
           </h2>
         </Reveal>
 
-        <div className="relative mx-auto mt-16 max-w-3xl px-6">
-          <div className="absolute left-4 top-0 h-full w-0.5 bg-slate-200 sm:left-1/2 sm:-translate-x-1/2" />
+        <div className="relative mx-auto mt-16 max-w-3xl px-4 sm:px-6">
+          <div className="absolute left-1/2 top-0 h-full w-0.5 -translate-x-1/2 bg-slate-200" />
 
-          <div className="space-y-10">
-            {timeline.map((item, i) => (
-              <Reveal key={item.year} delay={i * 0.08}>
+          <div className="space-y-6">
+            {timeline.map((item, i) => {
+              const isLeft = i % 2 === 0;
+              const card = (
                 <div
-                  className={`relative flex items-start gap-6 sm:items-center ${
-                    i % 2 === 0 ? "sm:flex-row" : "sm:flex-row-reverse"
+                  className={`inline-block w-full max-w-xs rounded-xl bg-white p-4 shadow-soft ${
+                    isLeft ? "text-right" : "text-left"
                   }`}
                 >
-                  <div
-                    className={`hidden flex-1 sm:block ${
-                      i % 2 === 0 ? "text-right" : "text-left"
-                    }`}
-                  >
-                    {i % 2 === 0 && (
-                      <p className="inline-block max-w-sm rounded-xl bg-white p-4 text-sm text-slate-600 shadow-soft">
-                        {item.text}
-                      </p>
-                    )}
-                  </div>
-
-                  <div className="relative z-10 grid h-9 w-9 shrink-0 place-items-center rounded-full bg-inem-navy text-white ring-4 ring-slate-50">
-                    <CalendarDays size={15} />
-                  </div>
-
-                  <div className="flex-1">
-                    <span className="font-display text-lg font-extrabold text-inem-blue">
-                      {item.year}
-                    </span>
-                    <p className="mt-1 rounded-xl bg-white p-4 text-sm text-slate-600 shadow-soft sm:hidden">
-                      {item.text}
-                    </p>
-                    {i % 2 !== 0 && (
-                      <p className="mt-1 hidden max-w-sm rounded-xl bg-white p-4 text-sm text-slate-600 shadow-soft sm:block">
-                        {item.text}
-                      </p>
-                    )}
-                  </div>
+                  <span className="font-display text-base font-extrabold text-inem-blue">
+                    {item.year}
+                  </span>
+                  <p className="mt-1 text-sm text-slate-600">{item.text}</p>
                 </div>
-              </Reveal>
-            ))}
+              );
+
+              return (
+                <Reveal key={item.year} delay={i * 0.08}>
+                  <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2 sm:gap-6">
+                    <div className={isLeft ? "flex justify-end" : ""}>
+                      {isLeft && card}
+                    </div>
+
+                    <div className="relative z-10 grid h-9 w-9 shrink-0 place-items-center rounded-full bg-inem-navy text-white ring-4 ring-slate-50">
+                      <CalendarDays size={15} />
+                    </div>
+
+                    <div className={!isLeft ? "flex justify-start" : ""}>
+                      {!isLeft && card}
+                    </div>
+                  </div>
+                </Reveal>
+              );
+            })}
           </div>
 
           <Reveal delay={0.3}>
